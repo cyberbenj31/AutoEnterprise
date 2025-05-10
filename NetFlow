@@ -1,0 +1,35 @@
+task 2: 1 of 5 labs
+conf t
+flow record CCNP9-CUSTOM-OUT
+ desc Custom Flow Record for outbound traffic
+ match ipv4 destination address
+ match transport destination-port
+ collect counter bytes
+ collect counter packets 
+ end
+ 
+Create a flow exporter
+config t
+flow exporter CCNP8-COLLECTOR-HOST
+destination 192.168.104.1
+export-protocol netflow-v9
+transport UDP 9999
+
+Combine flow monitor and fow record:
+config t
+ flow monitor CCNP8-INDOUND-MONITOR
+ record netflow ipv4 original-input
+ cache timeout active 30
+ exporter CCNP8-COLLECTOR-HOST
+ Flow monitor CCNP8-OUTBOUND-MONITOR
+ record CCNP9-CUSTOM-OUT
+cache timeout active 30
+ exporter CCNP8-COLLECTOR-HOST
+ exit
+ 
+ define the interface to MONITOR
+ config t
+ int gi3
+ ip flow monitor CCNP8-INDOUND-MONITOR input
+ ip flow monitor CCNP8-OUTBOUND-MONITOR output
+
